@@ -1,3 +1,3 @@
-export * from './loadEvents.port';
-export * from './loadBetslip.port';
-export * from './updateBetslip.port';
+export type { LoadEventsPort } from './loadEvents.port';
+export type { LoadBetslipPort } from './loadBetslip.port';
+export type { UpdateBetslipPort } from './updateBetslip.port';

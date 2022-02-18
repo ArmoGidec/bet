@@ -4,7 +4,7 @@ import { Selection } from './selection';
 export class Market {
   constructor(
     private readonly _name: string,
-    private readonly _markets: Selection[],
+    private readonly _selections: Selection[],
     private readonly _id?: ID,
   ) {}
 
@@ -12,8 +12,8 @@ export class Market {
     return this._id || null;
   }
 
-  public get markets(): Selection[] {
-    return this._markets;
+  public get selections(): Selection[] {
+    return this._selections;
   }
 
   public get name(): string {

@@ -1,2 +1,2 @@
 export * from './in';
-export * from './out';
+export type { LoadBetslipPort, LoadEventsPort, UpdateBetslipPort } from './out';
