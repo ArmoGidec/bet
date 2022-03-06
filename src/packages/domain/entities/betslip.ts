@@ -7,6 +7,10 @@ export class Betslip {
     return this._selections;
   }
 
+  clone() {
+    return new Betslip(this._selections);
+  }
+
   addSelection(selection: Selection) {
     this.selections.push(selection);
     return this;

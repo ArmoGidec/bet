@@ -14,7 +14,6 @@ export function useEvents(): {
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    const abortController = new AbortController();
     const fetchEvents = async () => {
       setLoading(true);
       try {
@@ -25,9 +24,6 @@ export function useEvents(): {
     };
 
     fetchEvents();
-    () => {
-      abortController.abort();
-    };
   }, []);
 
   return {

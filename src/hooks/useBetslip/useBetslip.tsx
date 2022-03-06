@@ -32,7 +32,7 @@ export function useBetslipProvider() {
   const [betslip, setBetslip] = useState(new Betslip([]));
 
   const fetchBetslip = () => {
-    getBetslip().then(setBetslip);
+    getBetslip().then((bs) => setBetslip(bs.clone()));
   };
 
   const contextValue = {
