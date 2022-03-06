@@ -18,8 +18,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@domain": ["./src/domain/index.ts"],
-      "@domain/*": ["./src/domain/*"],
+      "@domain": ["./src/packages/domain/index.ts"],
+      "@domain/*": ["./src/packages/domain/*"],
       "@services": ["./src/services/index.ts"],
       "@services/*": ["./src/services/*"],
       "@components": ["./src/components/index.ts"],
@@ -28,6 +28,8 @@
       "@mappers/*": ["./src/mappers/*"],
       "@shared": ["./src/shared/index.ts"],
       "@shared/*": ["./src/shared/*"],
+      "@hooks": ["./src/hooks/index.ts"],
+      "@hooks/*": ["./src/hooks/*"]
     }
   },
   "include": ["src"],
