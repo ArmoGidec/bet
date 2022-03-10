@@ -16,16 +16,16 @@ export class BetslipService implements GetBetslipQuery, AddSelectionUseCase {
 
   private _betslip: Betslip | null = null;
 
-  async getBetslip(): Promise<Betslip> {
+  getBetslip = async (): Promise<Betslip> => {
     if (!this._betslip) {
       this._betslip = await this._loadBetslipPort.loadBetslip();
     }
     return this._betslip;
   }
 
-  async addSelection(
+  addSelection = async (
     addSelectionCommand: AddSelectionCommand,
-  ): Promise<boolean> {
+  ): Promise<boolean> => {
     const betslip = await this.getBetslip();
 
     const selectionsMarketRecord = Object.fromEntries(
@@ -48,7 +48,7 @@ export class BetslipService implements GetBetslipQuery, AddSelectionUseCase {
     return true;
   }
 
-  async removeSelection(removeSelectionCommand: RemoveSelectionCommand) {
+  removeSelection = async (removeSelectionCommand: RemoveSelectionCommand) => {
     const betslip = await this.getBetslip();
 
     betslip.removeSelection(removeSelectionCommand.selection);

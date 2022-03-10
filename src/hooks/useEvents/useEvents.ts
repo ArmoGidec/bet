@@ -1,34 +1,41 @@
-import { EventAdapter } from './event.adapter';
-import { Event, LoadEventsPort } from '@domain';
-import { useEffect, useState } from 'react';
+import { Event, EventService, LoadEventsPort } from '@domain';
+import { EventMapper, RawEvent } from '@mappers';
+import { useMemo } from 'react';
 
-const eventAdapter = new EventAdapter();
+const delay = (ms: number) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
-const loadEvents: LoadEventsPort['loadEvents'] = () => eventAdapter.loadEvents();
+export function useEvents(): { eventService: EventService; abort: () => void } {
+  const abortController = useMemo(() => new AbortController(), []);
 
-export function useEvents(): {
-  events: Event[],
-  isLoading: boolean,
-} {
-  const [isLoading, setLoading] = useState(false);
-  const [events, setEvents] = useState<Event[]>([]);
+  const loadEventsPort = useMemo<LoadEventsPort>(() => {
+    const loadEvents = async (): Promise<Event[]> => {
+      const rawEvents: RawEvent[] = await fetch(
+        'http://www.mocky.io/v2/59f08692310000b4130e9f71',
+        {
+          signal: abortController.signal,
+        },
+      ).then((resp) => resp.json());
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        setEvents(await loadEvents());
-      } finally {
-        setLoading(false);
-      }
+      await delay(1500);
+
+      return rawEvents.map((rawEvent) => EventMapper.fromRaw(rawEvent));
     };
 
-    fetchEvents();
-  }, []);
+    return {
+      loadEvents,
+    };
+  }, [abortController]);
+
+  const eventService = useMemo(
+    () => new EventService(loadEventsPort),
+    [loadEventsPort],
+  );
 
   return {
-    events,
-    isLoading,
+    eventService,
+    abort: () => abortController.abort,
   };
 }
-

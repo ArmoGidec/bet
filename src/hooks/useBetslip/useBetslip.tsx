@@ -1,67 +1,48 @@
-import { AddSelectionCommand, Betslip, BetslipService } from '@domain';
-import { BetslipAdapter } from './betslip.adapter';
-import { createContext, FC, useContext, useEffect, useState } from 'react';
-import { RemoveSelectionCommand } from '@domain/ports/in/removeSelection.command';
+import { Betslip, BetslipService } from '@domain';
+import { BetslipMapper, RawBetslip } from '@mappers';
+import { Storage } from '@services';
+import { createContext, FC, useContext, useState } from 'react';
 
-const betslipAdapter = new BetslipAdapter();
+const storage = new Storage();
 
-const betslipService = new BetslipService(betslipAdapter, betslipAdapter);
+const BETSLIP_STORAGE_KEY = 'betslip';
 
-const getBetslip = () => betslipService.getBetslip();
-const addSelection = (
-  ...args: ConstructorParameters<typeof AddSelectionCommand>
-) => {
-  const addSelectionCommand = new AddSelectionCommand(...args);
-  return betslipService.addSelection(addSelectionCommand);
+const betslipPort = {
+  loadBetslip: async () => new Betslip([]),
+  updateBetslip: async (...args: any) => {},
 };
 
-const removeSelection = (
-  ...args: ConstructorParameters<typeof RemoveSelectionCommand>
-) => {
-  const removeSelectionCommand = new RemoveSelectionCommand(...args);
-  return betslipService.removeSelection(removeSelectionCommand);
-};
+const betslipService = new BetslipService(betslipPort, betslipPort);
 
-const BetslipContext = createContext({
-  betslip: new Betslip([]),
-  addSelection,
-  removeSelection,
-});
+const BetslipContext = createContext<BetslipService>(betslipService);
 
-export function useBetslipProvider() {
-  const [betslip, setBetslip] = useState(new Betslip([]));
+export const BetslipProvider: FC = ({ children }) => {
+  const betslipPort = {
+    loadBetslip: async () => {
+      if (!storage.has(BETSLIP_STORAGE_KEY)) {
+        storage.set(BETSLIP_STORAGE_KEY, { selections: [] });
+      }
+      const rawBetslip: RawBetslip = storage.get(BETSLIP_STORAGE_KEY);
 
-  const fetchBetslip = () => {
-    getBetslip().then((bs) => setBetslip(bs.clone()));
-  };
-
-  const contextValue = {
-    betslip,
-    addSelection: async (...args: Parameters<typeof addSelection>) => {
-      const result = await addSelection(...args);
-      fetchBetslip();
-      return result;
+      return BetslipMapper.fromRaw(rawBetslip);
     },
-    removeSelection: async (...args: Parameters<typeof removeSelection>) => {
-      const result = await removeSelection(...args);
-      fetchBetslip();
-      return result;
+    updateBetslip: async (betslip: Betslip) => {
+      storage.set(BETSLIP_STORAGE_KEY, BetslipMapper.toRaw(betslip));
+      setBetslipService(new BetslipService(betslipPort, betslipPort));
     },
   };
 
-  useEffect(() => {
-    fetchBetslip();
-  }, []);
+  const [betslipService, setBetslipService] = useState(
+    new BetslipService(betslipPort, betslipPort),
+  );
 
-  const BetslipProvider: FC = ({ children }) => (
-    <BetslipContext.Provider value={contextValue}>
+  return (
+    <BetslipContext.Provider value={betslipService}>
       {children}
     </BetslipContext.Provider>
   );
+};
 
-  return { BetslipProvider };
-}
-
-export function useBetslip() {
-  return useContext(BetslipContext);
+export function useBetslip(): BetslipService {
+  return useContext(BetslipContext) as unknown as BetslipService;
 }
