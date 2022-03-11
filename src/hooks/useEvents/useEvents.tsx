@@ -5,7 +5,6 @@ import {
   FC,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 
@@ -20,10 +19,10 @@ const EventsContext = createContext<{
 }>({ events: [], isLoading: false });
 
 export const EventsProvider: FC = ({ children }) => {
-  const abortController = useMemo(() => new AbortController(), []);
+  const abortController = new AbortController();
 
-  const loadEventsPort = useMemo<LoadEventsPort>(() => {
-    const loadEvents = async (): Promise<Event[]> => {
+  const loadEventsPort: LoadEventsPort = {
+    loadEvents: async (): Promise<Event[]> => {
       const rawEvents: RawEvent[] = await fetch(
         'http://www.mocky.io/v2/59f08692310000b4130e9f71',
         {
@@ -34,17 +33,10 @@ export const EventsProvider: FC = ({ children }) => {
       await delay(1500);
 
       return rawEvents.map((rawEvent) => EventMapper.fromRaw(rawEvent));
-    };
+    },
+  };
 
-    return {
-      loadEvents,
-    };
-  }, [abortController]);
-
-  const eventService = useMemo(
-    () => new EventService(loadEventsPort),
-    [loadEventsPort],
-  );
+  const eventService = new EventService(loadEventsPort);
 
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setLoadingStatus] = useState(false);

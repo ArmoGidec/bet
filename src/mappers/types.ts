@@ -17,5 +17,5 @@ export type RawSelection = {
 };
 
 export type RawBetslip = {
-  selections: RawSelection[];
+  selectionIds: RawSelection['id'][];
 };
