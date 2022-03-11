@@ -15,25 +15,18 @@ interface SelectionItemProps {
 }
 
 export function SelectionItem({ selection, market }: SelectionItemProps) {
-  const betsklipService = useBetslip();
-  const [betslip, setBetslip] = useState<Betslip>(new Betslip([]));
-
-  useEffect(() => {
-    betsklipService.getBetslip().then(setBetslip);
-  }, [betsklipService]);
+  const { betslip, removeSelection, addSelection } = useBetslip();
 
   const isInBetslip =
     betslip.selections.findIndex(({ id }) => id === selection.id) !== -1;
 
   const toggleSelection = () => {
     if (isInBetslip) {
-      const removeSelectionCommand = new RemoveSelectionCommand(selection);
-      betsklipService.removeSelection(removeSelectionCommand);
+      removeSelection(selection);
       return;
     }
 
-    const addSelectionCommand = new AddSelectionCommand(selection, market);
-    betsklipService.addSelection(addSelectionCommand);
+    addSelection(selection, market);
   };
 
   return (

@@ -1,13 +1,25 @@
 import { Event, EventService, LoadEventsPort } from '@domain';
 import { EventMapper, RawEvent } from '@mappers';
-import { useMemo } from 'react';
+import {
+  createContext,
+  FC,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 const delay = (ms: number) =>
   new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 
-export function useEvents(): { eventService: EventService; abort: () => void } {
+const EventsContext = createContext<{
+  events: Event[];
+  isLoading: boolean;
+}>({ events: [], isLoading: false });
+
+export const EventsProvider: FC = ({ children }) => {
   const abortController = useMemo(() => new AbortController(), []);
 
   const loadEventsPort = useMemo<LoadEventsPort>(() => {
@@ -34,8 +46,30 @@ export function useEvents(): { eventService: EventService; abort: () => void } {
     [loadEventsPort],
   );
 
-  return {
-    eventService,
-    abort: () => abortController.abort,
-  };
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setLoadingStatus] = useState(false);
+
+  useEffect(() => {
+    setLoadingStatus(true);
+    eventService
+      .getEvents()
+      .then(setEvents)
+      .finally(() => {
+        setLoadingStatus(false);
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, []);
+
+  return (
+    <EventsContext.Provider value={{ events, isLoading }}>
+      {children}
+    </EventsContext.Provider>
+  );
+};
+
+export function useEvents(): { events: Event[]; isLoading: boolean } {
+  return useContext(EventsContext);
 }

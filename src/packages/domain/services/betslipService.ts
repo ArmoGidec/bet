@@ -7,8 +7,11 @@ import {
 } from '../ports';
 import { GetBetslipQuery } from '../ports/in/getBetslip.query';
 import { RemoveSelectionCommand } from '@domain/ports/in/removeSelection.command';
+import { RemoveSelectionUseCase } from '@domain/ports/in/removeSelection.useCase';
 
-export class BetslipService implements GetBetslipQuery, AddSelectionUseCase {
+export class BetslipService
+  implements GetBetslipQuery, AddSelectionUseCase, RemoveSelectionUseCase
+{
   constructor(
     private readonly _loadBetslipPort: LoadBetslipPort,
     private readonly _updateBetslipPort: UpdateBetslipPort,
@@ -21,7 +24,7 @@ export class BetslipService implements GetBetslipQuery, AddSelectionUseCase {
       this._betslip = await this._loadBetslipPort.loadBetslip();
     }
     return this._betslip;
-  }
+  };
 
   addSelection = async (
     addSelectionCommand: AddSelectionCommand,
@@ -46,7 +49,7 @@ export class BetslipService implements GetBetslipQuery, AddSelectionUseCase {
 
     await this._updateBetslipPort.updateBetslip(betslip);
     return true;
-  }
+  };
 
   removeSelection = async (removeSelectionCommand: RemoveSelectionCommand) => {
     const betslip = await this.getBetslip();
@@ -55,5 +58,5 @@ export class BetslipService implements GetBetslipQuery, AddSelectionUseCase {
     await this._updateBetslipPort.updateBetslip(betslip);
 
     return true;
-  }
+  };
 }

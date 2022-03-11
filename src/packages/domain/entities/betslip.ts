@@ -1,3 +1,4 @@
+import { Market } from './market';
 import { Selection } from './selection';
 
 export class Betslip {
@@ -5,10 +6,6 @@ export class Betslip {
 
   public get selections(): Selection[] {
     return this._selections;
-  }
-
-  clone() {
-    return new Betslip(this._selections);
   }
 
   addSelection(selection: Selection) {

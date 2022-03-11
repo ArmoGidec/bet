@@ -5,8 +5,7 @@ export class Selection {
     private readonly _name: string,
     private readonly _price: number,
     private readonly _id?: ID,
-  ) {
-  }
+  ) {}
 
   public get name(): string {
     return this._name;

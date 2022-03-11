@@ -1,1 +1,1 @@
-export { useBetslip } from './useBetslip';
+export * from './useBetslip';
