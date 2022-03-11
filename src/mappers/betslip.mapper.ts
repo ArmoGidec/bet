@@ -2,9 +2,14 @@ import { Betslip, Selection } from '@domain';
 import { type RawBetslip, SelectionMapper } from '.';
 
 export class BetslipMapper {
-  static fromRaw(rawBetslip: RawBetslip, selectionsRecord: Record<PropertyKey, Selection>): Betslip {
+  static fromRaw(
+    rawBetslip: RawBetslip,
+    selectionsRecord: Record<PropertyKey, Selection>,
+  ): Betslip {
     return Betslip.of(
-      rawBetslip.selectionIds.map((selectionId) => selectionsRecord[selectionId!]),
+      rawBetslip.selectionIds
+        .map((selectionId) => selectionsRecord[selectionId!])
+        .filter((selection) => !!selection),
     );
   }
 

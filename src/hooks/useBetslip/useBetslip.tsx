@@ -77,7 +77,7 @@ export const BetslipProvider: FC = ({ children }) => {
 
   useEffect(() => {
     betslipService.getBetslip().then(setBetslip);
-  }, []);
+  }, [selectionsRecord]);
 
   return (
     <BetslipContext.Provider value={{ betslip, addSelection, removeSelection }}>
