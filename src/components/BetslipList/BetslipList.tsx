@@ -9,6 +9,7 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
+import { useMemo } from 'react';
 
 export const BetslipList = () => {
   const { betslip, removeSelection } = useBetslip();
@@ -18,17 +19,17 @@ export const BetslipList = () => {
     removeSelection(selection);
   };
 
-  const getMarket = (selection: Selection): Market | null => {
-    for (const event of events) {
-      const market = event.markets.find(
-        ({ selections }) => !!selections.find(({ id }) => selection.id === id),
-      );
+  const marketsRecord = useMemo(() => {
+    const entries = events.flatMap(({ markets }) =>
+      markets.flatMap((market) =>
+        market.selections.map(({ id }) => [id, market]),
+      ),
+    );
+    return Object.fromEntries(entries);
+  }, [events]);
 
-      if (market) {
-        return market;
-      }
-    }
-    return null;
+  const getMarket = (selection: Selection): Market | null => {
+    return selection.id && marketsRecord[selection.id] || null;
   };
 
   return (
