@@ -5,17 +5,23 @@ import {
   LoadBetslipPort,
   UpdateBetslipPort,
 } from '../../ports';
-import { Betslip, Selection } from '../../entities';
+import { Betslip, Market, Selection } from '../../entities';
 
 describe('BetslipService', () => {
-  it('should add selection success', () => {
+  it('should add selection success', async () => {
     const loadBetslipPort = mock<LoadBetslipPort>();
     const updateBetslipPort = mock<UpdateBetslipPort>();
 
     const mockedBetslip = mock(Betslip);
 
+    when(mockedBetslip.selections).thenReturn([])
+
     when(loadBetslipPort.loadBetslip()).thenReturn(
       Promise.resolve(instance(mockedBetslip)),
+    );
+
+    when(updateBetslipPort.updateBetslip(mockedBetslip)).thenReturn(
+      Promise.resolve(),
     );
 
     const betslipService = new BetslipService(
@@ -24,9 +30,16 @@ describe('BetslipService', () => {
     );
 
     const mockedSelection = mock(Selection);
-    const command = new AddSelectionCommand(instance(mockedSelection));
+    const mockedMarked = mock(Market);
 
-    const result = betslipService.addSelection(command);
+    when(mockedMarked.selections).thenReturn([]);
+
+    const command = new AddSelectionCommand(
+      instance(mockedSelection),
+      instance(mockedMarked),
+    );
+
+    const result = await betslipService.addSelection(command);
     expect(result).toBeTruthy();
   });
 });
